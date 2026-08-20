@@ -16,14 +16,13 @@ jobs:
       - name: Checkout Source Code
         uses: actions/checkout@v4
 
-      # 2. Setup Node.js Environment
+      # 2. Setup Node.js (Removed cache: 'npm' to prevent lockfile error)
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
 
-      # 3. Setup Java Development Kit (JDK 17 required for Android SDK 33+)
+      # 3. Setup Java Development Kit (JDK 17 for Android SDK)
       - name: Setup Java JDK
         uses: actions/setup-java@v4
         with:
@@ -36,32 +35,24 @@ jobs:
 
       # 5. Install Dependencies & Build Web Assets
       - name: Install Project Dependencies
-        run: |
-          if [ -f bun.lock ]; then
-            npx bun install --frozen-lockfile || npm install
-          else
-            npm ci || npm install
-          fi
+        run: npm install
 
       - name: Build Web Distributable
         run: npm run build
 
-      # 6. Initialize & Configure Capacitor (If not already configured)
+      # 6. Initialize & Configure Capacitor for Android
       - name: Configure Capacitor & Add Android Platform
         run: |
           npm install @capacitor/core @capacitor/cli @capacitor/android
 
-          # Initialize Capacitor if capacitor.config.json doesn't exist
           if [ ! -f capacitor.config.json ] && [ ! -f capacitor.config.ts ]; then
             npx cap init "HealthIsWealth" "com.healthiswealth.app" --web-dir dist
           fi
 
-          # Add Android platform directory if missing
           if [ ! -d "android" ]; then
             npx cap add android
           fi
 
-          # Sync web assets to native Android container
           npx cap sync android
 
       # 7. Grant Execution Permission to Gradle Wrapper
