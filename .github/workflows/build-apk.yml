@@ -1,0 +1,83 @@
+name: Build Android APK
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout Repository
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      # 2. Setup Node.js Environment
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      # 3. Setup Java Development Kit (JDK 17 required for Android SDK 33+)
+      - name: Setup Java JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      # 4. Setup Android SDK
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      # 5. Install Dependencies & Build Web Assets
+      - name: Install Project Dependencies
+        run: |
+          if [ -f bun.lock ]; then
+            npx bun install --frozen-lockfile || npm install
+          else
+            npm ci || npm install
+          fi
+
+      - name: Build Web Distributable
+        run: npm run build
+
+      # 6. Initialize & Configure Capacitor (If not already configured)
+      - name: Configure Capacitor & Add Android Platform
+        run: |
+          npm install @capacitor/core @capacitor/cli @capacitor/android
+
+          # Initialize Capacitor if capacitor.config.json doesn't exist
+          if [ ! -f capacitor.config.json ] && [ ! -f capacitor.config.ts ]; then
+            npx cap init "HealthIsWealth" "com.healthiswealth.app" --web-dir dist
+          fi
+
+          # Add Android platform directory if missing
+          if [ ! -d "android" ]; then
+            npx cap add android
+          fi
+
+          # Sync web assets to native Android container
+          npx cap sync android
+
+      # 7. Grant Execution Permission to Gradle Wrapper
+      - name: Grant Executable Permission to Gradle
+        run: chmod +x android/gradlew
+
+      # 8. Build Debug APK using Gradle
+      - name: Build APK with Gradle
+        run: |
+          cd android
+          ./gradlew assembleDebug --stacktrace --no-daemon
+
+      # 9. Upload APK as Artifact
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: health-is-wealth-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 7
