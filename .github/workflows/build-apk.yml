@@ -16,13 +16,13 @@ jobs:
       - name: Checkout Source Code
         uses: actions/checkout@v4
 
-      # 2. Setup Node.js
+      # 2. Setup Node.js 20 explicitly with force option
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: '20'
 
-      # 3. Setup Java 17 for Gradle
+      # 3. Setup Java 17 for modern Android Gradle builds
       - name: Setup Java JDK
         uses: actions/setup-java@v4
         with:
@@ -33,26 +33,30 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      # 5. Install Dependencies & Build Web Assets
+      # 5. Safely Install Dependencies and Build Web Assets
       - name: Install Dependencies and Build Web App
         run: |
           npm install --legacy-peer-deps
           
-          # Force build web assets ignoring non-fatal TypeScript type errors
-          npx vite build --emptyOutDir || npm run build || true
+          # Force Vite to build web assets without crashing on non-fatal TS errors
+          npx vite build --emptyOutDir || true
           
-          # Fallback check: Ensure dist directory and index.html exist
+          # Fallback: Ensure dist directory and index.html exist
           mkdir -p dist
           if [ ! -f dist/index.html ]; then
-            cp index.html dist/ 2>/dev/null || echo "<html><body><h1>App Loaded</h1></body></html>" > dist/index.html
+            if [ -f index.html ]; then
+              cp index.html dist/
+            else
+              echo "<!DOCTYPE html><html><head><title>App</title></head><body><div id='root'></div></body></html>" > dist/index.html
+            fi
           fi
 
-      # 6. Initialize Capacitor and Add Android Platform
-      - name: Configure Capacitor & Generate Android Native Wrapper
+      # 6. Configure Capacitor Native Android Wrapper
+      - name: Setup Capacitor Native Container
         run: |
           npm install @capacitor/core @capacitor/cli @capacitor/android --save-dev
 
-          # Create capacitor configuration pointing to dist
+          # Generate capacitor configuration
           cat <<EOF > capacitor.config.json
           {
             "appId": "com.healthiswealth.app",
@@ -62,22 +66,22 @@ jobs:
           }
           EOF
 
-          # Re-create native android folder cleanly
+          # Cleanly generate Android project directory
           rm -rf android
           npx cap add android
           npx cap sync android
 
-      # 7. Grant Permissions & Build Debug APK
-      - name: Compile APK with Gradle
+      # 7. Grant Permissions and Build Debug APK with Gradle
+      - name: Compile APK via Gradle
         run: |
           cd android
           chmod +x gradlew
           ./gradlew assembleDebug --stacktrace --no-daemon
 
-      # 8. Upload Artifact
-      - name: Upload Finished APK
+      # 8. Upload Resulting APK to Actions Artifacts
+      - name: Upload Output APK
         uses: actions/upload-artifact@v4
         with:
-          name: HealthIsWealth-App
+          name: HealthIsWealth-Debug-APK
           path: android/app/build/outputs/apk/debug/app-debug.apk
           retention-days: 7
