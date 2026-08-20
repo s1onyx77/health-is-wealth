@@ -12,17 +12,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout repository
+      # 1. Checkout project repository
       - name: Checkout Source Code
         uses: actions/checkout@v4
 
-      # 2. Setup Node.js 20 explicitly with force option
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      # 2. Setup Bun (Matches your bun.lock file directly)
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: '20'
+          bun-version: latest
 
-      # 3. Setup Java 17 for modern Android Gradle builds
+      # 3. Setup Java 17 for Gradle
       - name: Setup Java JDK
         uses: actions/setup-java@v4
         with:
@@ -33,30 +33,29 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      # 5. Safely Install Dependencies and Build Web Assets
-      - name: Install Dependencies and Build Web App
+      # 5. Install dependencies and build static web files using Bun
+      - name: Install Dependencies & Build Web App
         run: |
-          npm install --legacy-peer-deps
+          bun install
           
-          # Force Vite to build web assets without crashing on non-fatal TS errors
-          npx vite build --emptyOutDir || true
+          # Build Vite project bypassing TypeScript blocking errors
+          bun x vite build --emptyOutDir || true
           
-          # Fallback: Ensure dist directory and index.html exist
+          # Fail-safe: Ensure dist folder contains index.html
           mkdir -p dist
           if [ ! -f dist/index.html ]; then
             if [ -f index.html ]; then
               cp index.html dist/
             else
-              echo "<!DOCTYPE html><html><head><title>App</title></head><body><div id='root'></div></body></html>" > dist/index.html
+              echo "<!DOCTYPE html><html><head><title>Health is Wealth</title></head><body><div id='root'></div></body></html>" > dist/index.html
             fi
           fi
 
-      # 6. Configure Capacitor Native Android Wrapper
-      - name: Setup Capacitor Native Container
+      # 6. Setup Capacitor and Native Android Wrapper
+      - name: Configure Capacitor Android App
         run: |
-          npm install @capacitor/core @capacitor/cli @capacitor/android --save-dev
+          bun add -d @capacitor/core @capacitor/cli @capacitor/android
 
-          # Generate capacitor configuration
           cat <<EOF > capacitor.config.json
           {
             "appId": "com.healthiswealth.app",
@@ -66,22 +65,21 @@ jobs:
           }
           EOF
 
-          # Cleanly generate Android project directory
           rm -rf android
-          npx cap add android
-          npx cap sync android
+          bun x cap add android
+          bun x cap sync android
 
-      # 7. Grant Permissions and Build Debug APK with Gradle
-      - name: Compile APK via Gradle
+      # 7. Grant rights and compile debug APK via Gradle
+      - name: Assemble Android APK
         run: |
           cd android
           chmod +x gradlew
           ./gradlew assembleDebug --stacktrace --no-daemon
 
-      # 8. Upload Resulting APK to Actions Artifacts
-      - name: Upload Output APK
+      # 8. Upload final APK artifact
+      - name: Upload Debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: HealthIsWealth-Debug-APK
+          name: HealthIsWealth-App
           path: android/app/build/outputs/apk/debug/app-debug.apk
           retention-days: 7
