@@ -1,0 +1,6 @@
+{
+  "name": "GlucoFit AI - Metabolic Nutrition & CGM Companion",
+  "description": "An AI-powered mobile health app that tracks nutrition, syncs real-time continuous glucose monitoring (CGM) dynamics, generates personalized glucose-stabilizing meal plans, and delivers actionable wellness insights for metabolic longevity.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

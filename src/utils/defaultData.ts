@@ -1,0 +1,332 @@
+import { MealItem, MealPlan, ActionCard, UserProfile } from '../types';
+
+export const defaultUserProfile: UserProfile = {
+  name: 'Alex Morgan',
+  age: 32,
+  dietaryPreference: 'Mediterranean Low-GI',
+  allergies: 'None',
+  targetCalorieBudget: 2100,
+  targetCarbBudget: 130,
+  targetProteinBudget: 140,
+  targetFatBudget: 75,
+  targetFiberBudget: 35,
+  targetGlucoseRange: { min: 70, max: 140 },
+  cgmSensorName: 'Dexcom G7 Continuous Stream',
+  cgmConnected: true,
+  sensorDaysRemaining: 8,
+  simulationSpeed: 'normal',
+};
+
+export const defaultMeals: MealItem[] = [
+  {
+    id: 'meal-1',
+    name: 'Wild Blueberry & Chia Protein Greek Yogurt Bowl',
+    mealType: 'breakfast',
+    timestamp: new Date(Date.now() - 6 * 3600 * 1000).toISOString(),
+    calories: 380,
+    carbs: 26,
+    netCarbs: 18,
+    fiber: 8,
+    protein: 34,
+    fat: 14,
+    glycemicIndex: 32,
+    glycemicLoad: 6,
+    predictedSpikeMgDl: 16,
+    actualSpikeMgDl: 14,
+    spikeRisk: 'Low',
+    glycemicScore: 94,
+    sequencingAdvice: 'Chia fiber and Greek yogurt fats coat the gut epithelium before berry fructose absorption.',
+    biohackTips: [
+      'Cinnamon added on top slows gastric emptying and enhances insulin sensitivity.',
+      'Hydrate with 500ml water beforehand.'
+    ],
+    ingredients: ['Full-Fat Greek Yogurt', 'Chia Seeds', 'Wild Blueberries', 'Ceylon Cinnamon', 'Walnuts'],
+  },
+  {
+    id: 'meal-2',
+    name: 'Mediterranean Pan-Seared Salmon & Quinoa Bowl',
+    mealType: 'lunch',
+    timestamp: new Date(Date.now() - 2.5 * 3600 * 1000).toISOString(),
+    calories: 560,
+    carbs: 34,
+    netCarbs: 25,
+    fiber: 9,
+    protein: 42,
+    fat: 26,
+    glycemicIndex: 38,
+    glycemicLoad: 9,
+    predictedSpikeMgDl: 22,
+    actualSpikeMgDl: 19,
+    spikeRisk: 'Low',
+    glycemicScore: 91,
+    sequencingAdvice: 'Eat the dressed arugula and cucumber first, then salmon, and finish with the warm quinoa.',
+    biohackTips: [
+      'Extra virgin olive oil rich in oleic acid slows carbohydrate breakdown.',
+      '10-minute post-lunch walk lowered peak glucose excursion by ~24 mg/dL.'
+    ],
+    ingredients: ['Wild Atlantic Salmon', 'Baby Arugula', 'Tri-Color Quinoa', 'Avocado', 'Kalamata Olives', 'Lemon Tahini'],
+  },
+  {
+    id: 'meal-3',
+    name: 'Herb-Roasted Pasture Chicken & Tuscan Greens',
+    mealType: 'dinner',
+    timestamp: new Date(Date.now() + 3 * 3600 * 1000).toISOString(),
+    calories: 520,
+    carbs: 18,
+    netCarbs: 11,
+    fiber: 7,
+    protein: 48,
+    fat: 24,
+    glycemicIndex: 25,
+    glycemicLoad: 4,
+    predictedSpikeMgDl: 12,
+    spikeRisk: 'Low',
+    glycemicScore: 96,
+    sequencingAdvice: 'Enjoy steamed broccoli and rosemary roasted vegetables first to create a fiber mesh before protein.',
+    biohackTips: [
+      'Keep dinner at least 3 hours before sleep to prevent elevated overnight resting glucose.',
+      'Magnesium glycinate supplement post-dinner supports nocturnal glucose homeostasis.'
+    ],
+    ingredients: ['Pasture-Raised Chicken Breast', 'Broccoli Florets', 'Zucchini', 'Rosemary Garlic Olive Oil', 'Pine Nuts'],
+  },
+  {
+    id: 'meal-4',
+    name: 'Raw Almonds & Dark Chocolate 85%',
+    mealType: 'snack',
+    timestamp: new Date(Date.now() - 4.5 * 3600 * 1000).toISOString(),
+    calories: 190,
+    carbs: 10,
+    netCarbs: 6,
+    fiber: 4,
+    protein: 6,
+    fat: 16,
+    glycemicIndex: 20,
+    glycemicLoad: 2,
+    predictedSpikeMgDl: 8,
+    spikeRisk: 'Low',
+    glycemicScore: 95,
+    sequencingAdvice: 'Polyphenols in dark chocolate combined with almond fiber promote stable steady-state energy.',
+    biohackTips: ['Pairs wonderfully with green tea rich in EGCG.'],
+    ingredients: ['Organic Sprouted Almonds', '85% Single-Origin Dark Chocolate'],
+  }
+];
+
+export const defaultPersonalizedMealPlan: MealPlan = {
+  id: 'plan-today',
+  dayTitle: 'Precision Glucose Stabilization Day',
+  generatedAt: new Date().toISOString(),
+  glucoseStateAssessment: 'Current glucose is optimal (98-112 mg/dL). This meal plan utilizes high fiber preloads, antioxidant polyphenols, and lean protein to prevent glycemic variability throughout the day.',
+  targetDailyMacros: {
+    calories: 2050,
+    carbs: 115,
+    protein: 145,
+    fat: 85,
+    fiber: 38,
+    avgGlycemicLoad: 6.8,
+  },
+  dietPreference: 'Mediterranean Low-GI',
+  dailySpikeMitigationRule: 'Golden Rule: Always eat your green vegetable fiber first, protein/fats second, and complex carbohydrates last.',
+  hydrationGoalLiters: 2.8,
+  meals: [
+    {
+      mealType: 'Breakfast',
+      timeWindow: '08:00 AM - 09:00 AM',
+      recipeName: 'Avocado & Soft-Poached Eggs on Sprouted Flax Bread',
+      description: 'Rich in monounsaturated fats, choline, and soluble prebiotic fiber that creates a protective gel in the small intestine.',
+      prepTimeMinutes: 12,
+      calories: 420,
+      carbs: 22,
+      fiber: 9,
+      protein: 24,
+      fat: 26,
+      glycemicLoad: 4,
+      predictedGlucosePeak: '+12-16 mg/dL',
+      ingredients: [
+        { name: 'Sprouted Ezekiel Flax Bread', amount: '1 slice', glycemicBenefit: 'Low glycemic index (GI 35) with intact grain germ' },
+        { name: 'Pasture Eggs', amount: '2 large', glycemicBenefit: 'Zero carb, high bioavailability protein & lutein' },
+        { name: 'Fresh Hass Avocado', amount: '1/2 medium', glycemicBenefit: 'Oleic acid slows gastric emptying' },
+        { name: 'Microgreens & Red Pepper Flakes', amount: '1 handful', glycemicBenefit: 'Sulforaphane activates Nrf2 cellular antioxidant pathways' }
+      ],
+      instructions: [
+        'Toast the sprouted bread lightly.',
+        'Poach eggs in simmering water with a dash of apple cider vinegar for 3 minutes.',
+        'Mash avocado onto toast with sea salt, top with eggs and microgreens.'
+      ],
+      sequencingGuide: 'Eat the dressed microgreens with avocado mash first, then eggs and sprouted toast.',
+      cgmTip: 'Morning insulin sensitivity is naturally high, making sprouted fiber ideal for sustained morning focus.'
+    },
+    {
+      mealType: 'Lunch',
+      timeWindow: '12:30 PM - 01:30 PM',
+      recipeName: 'Grilled Wild Herb Salmon with Arugula & Warm Lentil Salad',
+      description: 'Omega-3 fatty acids and slow-digesting polyphenolic brown lentils deliver steady glucose release over 4 hours.',
+      prepTimeMinutes: 18,
+      calories: 580,
+      carbs: 36,
+      fiber: 12,
+      protein: 46,
+      fat: 24,
+      glycemicLoad: 8,
+      predictedGlucosePeak: '+18-22 mg/dL',
+      ingredients: [
+        { name: 'Wild Sockeye Salmon', amount: '170g', glycemicBenefit: 'EPA/DHA reduces systemic inflammation and improves insulin signaling' },
+        { name: 'French Green Lentils (Cooked)', amount: '1/2 cup', glycemicBenefit: 'High amylose resistant starch with minimal glycemic surge' },
+        { name: 'Wild Baby Arugula & Shaved Fennel', amount: '2 cups', glycemicBenefit: 'Bitters stimulate bile acid and digestive enzyme secretion' },
+        { name: 'Cold-Pressed Olive Oil & Lemon Dressing', amount: '1.5 tbsp', glycemicBenefit: 'Polyphenols blunt postprandial glucose spike' }
+      ],
+      instructions: [
+        'Season salmon with sea salt, dill, and black pepper; sear on medium-high for 4 mins per side.',
+        'Toss warm lentils with arugula, fennel, lemon juice, and extra virgin olive oil.',
+        'Serve salmon over the dressed greens bed.'
+      ],
+      sequencingGuide: 'Consume 100% of the salad greens and lentils first, then savor the salmon filet.',
+      cgmTip: 'Schedule a 10-minute leisurely outdoor walk 25 minutes after eating to keep peak glucose under 125 mg/dL.'
+    },
+    {
+      mealType: 'Dinner',
+      timeWindow: '06:30 PM - 07:30 PM',
+      recipeName: 'Grass-Fed Beef Sirloin with Roasted Garlic Cauliflower Mash & Asparagus',
+      description: 'Ultra-low glycemic dinner that prevents nocturnal glucose spikes and supports optimal deep sleep recovery.',
+      prepTimeMinutes: 20,
+      calories: 560,
+      carbs: 16,
+      fiber: 8,
+      protein: 52,
+      fat: 28,
+      glycemicLoad: 3,
+      predictedGlucosePeak: '+8-12 mg/dL',
+      ingredients: [
+        { name: 'Grass-Fed Sirloin Steak', amount: '180g', glycemicBenefit: 'High creatine and leucine for nocturnal protein synthesis' },
+        { name: 'Steamed Cauliflower & Garlic Mash', amount: '1.5 cups', glycemicBenefit: 'Keto-friendly potato alternative with high prebiotic fiber' },
+        { name: 'Charred Green Asparagus', amount: '8 spears', glycemicBenefit: 'Rich in glutathione and chromium which enhances insulin receptor activity' }
+      ],
+      instructions: [
+        'Steam cauliflower with garlic cloves and blend with grass-fed ghee and pinch of nutmeg until velvety.',
+        'Grill asparagus in olive oil for 5 minutes.',
+        'Pan-sear steak in cast iron skillet to medium-rare (3 mins each side).'
+      ],
+      sequencingGuide: 'Start with asparagus spears, follow with cauliflower mash, finish with sirloin steak.',
+      cgmTip: 'Finishing dinner before 7:30 PM allows baseline glucose to settle to 85 mg/dL before bedtime for max growth hormone release.'
+    },
+    {
+      mealType: 'Snack',
+      timeWindow: '04:00 PM - 04:30 PM',
+      recipeName: 'Cacao Polyphenol Chia Pudding with Crushed Macadamias',
+      description: 'Crucial 4 PM energy crash defense providing magnesium, healthy fats, and fiber.',
+      prepTimeMinutes: 5,
+      calories: 220,
+      carbs: 12,
+      fiber: 9,
+      protein: 6,
+      fat: 18,
+      glycemicLoad: 1,
+      predictedGlucosePeak: '+4-6 mg/dL',
+      ingredients: [
+        { name: 'Organic Chia Seeds', amount: '2 tbsp', glycemicBenefit: 'Gel-forming soluble fiber stabilizes blood sugar' },
+        { name: 'Raw Cacao Powder', amount: '1 tbsp', glycemicBenefit: 'Flavanols boost endothelial nitric oxide and glucose uptake' },
+        { name: 'Unsweetened Almond Milk', amount: '1/2 cup', glycemicBenefit: 'Zero added sugars' },
+        { name: 'Raw Macadamia Nuts', amount: '15g', glycemicBenefit: 'High in monounsaturated palmitoleic acid' }
+      ],
+      instructions: [
+        'Whisk chia seeds and raw cacao into almond milk.',
+        'Refrigerate 15 mins (or prep night before), top with crushed macadamias.'
+      ],
+      sequencingGuide: 'Enjoy as an afternoon treat with a glass of sparkling water and fresh lime.',
+      cgmTip: 'Keeps cortisol low and eliminates 4:00 PM sugar cravings.'
+    }
+  ]
+};
+
+export const defaultActionCards: ActionCard[] = [
+  {
+    id: 'act-1',
+    priority: 'High',
+    category: 'movement',
+    title: 'Post-Lunch 10-Minute Metabolic Walk',
+    description: 'Light skeletal muscle contractions immediately activate GLUT4 glucose transporters on cell membranes without requiring excess insulin.',
+    expectedGlucoseImpact: '-18 to -28 mg/dL spike reduction',
+    timeToExecute: 'Today at 1:45 PM (20m after lunch)',
+    completed: false,
+  },
+  {
+    id: 'act-2',
+    priority: 'High',
+    category: 'nutrition',
+    title: 'Apply Vegetable Fiber Sequencing',
+    description: 'Eat raw greens or fiber 5-10 minutes before starches to form a viscous barrier in the upper intestine, slowing glucose absorption rate.',
+    expectedGlucoseImpact: '-30% peak glucose excursion',
+    timeToExecute: 'At every main meal',
+    completed: true,
+  },
+  {
+    id: 'act-3',
+    priority: 'Medium',
+    category: 'nutrition',
+    title: 'Apple Cider Vinegar Pre-Meal Ritual',
+    description: 'Acetic acid in 1 tbsp ACV in water temporarily inhibits salivary alpha-amylase and boosts insulin sensitivity in skeletal muscle.',
+    expectedGlucoseImpact: '-20% postprandial spike',
+    timeToExecute: '10 min before dinner',
+    completed: false,
+  },
+  {
+    id: 'act-4',
+    priority: 'Low',
+    category: 'sleep',
+    title: 'Circadian Fasting Buffer Before Bed',
+    description: 'Stop caloric intake 3 hours prior to sleep. Late evening carbs disrupt nocturnal melatonin production and elevate fasting morning glucose.',
+    expectedGlucoseImpact: '-8 mg/dL fasting baseline',
+    timeToExecute: 'Tonight after 7:30 PM',
+    completed: false,
+  }
+];
+
+export const sampleFoodGallery = [
+  {
+    name: 'Avocado Toast with Poached Egg',
+    image: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&w=600&q=80',
+    description: '1 slice sprouted sourdough with 1/2 avocado, 1 poached egg, red pepper flakes, microgreens',
+    carbs: 22,
+    protein: 14,
+    fat: 18,
+    fiber: 7,
+    calories: 320,
+    gi: 34,
+    spike: 'Low (+14 mg/dL)',
+  },
+  {
+    name: 'Grilled Salmon Quinoa Bowl',
+    image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80',
+    description: '180g Atlantic salmon, 1/2 cup quinoa, roasted zucchini, arugula, lemon vinaigrette',
+    carbs: 28,
+    protein: 42,
+    fat: 22,
+    fiber: 8,
+    calories: 520,
+    gi: 38,
+    spike: 'Low (+18 mg/dL)',
+  },
+  {
+    name: 'Chocolate Glazed Pastry & Latte',
+    image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=600&q=80',
+    description: '1 bakery chocolate croissant with 1 sweetened vanilla whole milk latte',
+    carbs: 68,
+    protein: 8,
+    fat: 28,
+    fiber: 2,
+    calories: 590,
+    gi: 78,
+    spike: 'High (+62 mg/dL)',
+  },
+  {
+    name: 'Berry Chia Protein Bowl',
+    image: 'https://images.unsplash.com/photo-1590301157890-4810ed352733?auto=format&fit=crop&w=600&q=80',
+    description: 'Greek yogurt with chia seeds, wild blueberries, crushed walnuts, and cinnamon',
+    carbs: 24,
+    protein: 32,
+    fat: 12,
+    fiber: 9,
+    calories: 360,
+    gi: 28,
+    spike: 'Minimal (+10 mg/dL)',
+  }
+];
