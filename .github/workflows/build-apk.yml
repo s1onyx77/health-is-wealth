@@ -29,19 +29,24 @@ jobs:
       - name: Install dependencies
         run: bun install
 
-      # Generates native android directory if using Expo/React Native without an android folder in Git
-      - name: Prebuild Android Project
-        run: npx expo prebuild --platform android
-        continue-on-error: true
+      # 1. Build web assets
+      - name: Build Web Application
+        run: bun run build
 
-      - name: Make gradlew executable
-        run: chmod +x android/gradlew
+      # 2. Add Android platform & Sync Capacitor assets
+      - name: Add and Sync Android Project
+        run: |
+          npx cap add android || true
+          npx cap sync android
 
+      # 3. Make Gradle executable and build release APK
       - name: Build APK with Gradle
         run: |
           cd android
+          chmod +x gradlew
           ./gradlew assembleRelease --no-daemon
 
+      # 4. Upload APK Artifact
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
