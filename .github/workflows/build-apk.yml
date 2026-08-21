@@ -12,40 +12,36 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout project repository
       - name: Checkout Source Code
         uses: actions/checkout@v4
 
-      # 2. Setup Bun
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
 
-      # 3. Setup Java 17 for Gradle
       - name: Setup Java JDK
         uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
           java-version: '17'
 
-      # 4. Install Dependencies
       - name: Install dependencies
         run: bun install
 
-      # 5. Make Gradle executable (If building native Android directory)
-      - name: Make gradlew executable
-        run: chmod +x android/gradlew
+      # Generates native android directory if using Expo/React Native without an android folder in Git
+      - name: Prebuild Android Project
+        run: npx expo prebuild --platform android
         continue-on-error: true
 
-      # 6. Build Android APK
+      - name: Make gradlew executable
+        run: chmod +x android/gradlew
+
       - name: Build APK with Gradle
         run: |
           cd android
           ./gradlew assembleRelease --no-daemon
-        continue-on-error: true
 
-      # 7. Upload Build Artifact
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
