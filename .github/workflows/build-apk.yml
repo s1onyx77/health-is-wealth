@@ -31,7 +31,11 @@ jobs:
           bun install
           bun add -d @capacitor/cli @capacitor/core @capacitor/android
 
+      # Builds web application with environment variables injected from GitHub Secrets
       - name: Build Web Application
+        env:
+          VITE_GEMINI_API_KEY: ${{ secrets.VITE_GEMINI_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: bun run build
 
       - name: Add and Sync Android Project
@@ -40,14 +44,12 @@ jobs:
           bunx cap add android || true
           bunx cap sync android
 
-      # Build Debug APK instead of Unsigned Release APK
       - name: Build APK with Gradle
         run: |
           cd android
           chmod +x gradlew
           ./gradlew assembleDebug --no-daemon
 
-      # Upload the signed Debug APK
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
