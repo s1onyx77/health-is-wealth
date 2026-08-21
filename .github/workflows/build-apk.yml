@@ -31,17 +31,17 @@ jobs:
           bun install
           bun add -d @capacitor/cli @capacitor/core @capacitor/android
 
-      # Builds web application with environment variables injected from GitHub Secrets
       - name: Build Web Application
         env:
           VITE_GEMINI_API_KEY: ${{ secrets.VITE_GEMINI_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: bun run build
 
-      - name: Add and Sync Android Project
+      - name: Generate Native Android Project
         run: |
+          rm -rf android
           bunx cap init "HealthIsWealth" "com.health.is.wealth" --web-dir dist || true
-          bunx cap add android || true
+          bunx cap add android
           bunx cap sync android
 
       - name: Build APK with Gradle
