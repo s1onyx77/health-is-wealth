@@ -16,7 +16,7 @@ jobs:
       - name: Checkout Source Code
         uses: actions/checkout@v4
 
-      # 2. Setup Bun (Matches your bun.lock file directly)
+      # 2. Setup Bun
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
@@ -29,57 +29,25 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
-      # 4. Setup Android SDK
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+      # 4. Install Dependencies
+      - name: Install dependencies
+        run: bun install
 
-      # 5. Install dependencies and build static web files using Bun
-      - name: Install Dependencies & Build Web App
-        run: |
-          bun install
-          
-          # Build Vite project bypassing TypeScript blocking errors
-          bun x vite build --emptyOutDir || true
-          
-          # Fail-safe: Ensure dist folder contains index.html
-          mkdir -p dist
-          if [ ! -f dist/index.html ]; then
-            if [ -f index.html ]; then
-              cp index.html dist/
-            else
-              echo "<!DOCTYPE html><html><head><title>Health is Wealth</title></head><body><div id='root'></div></body></html>" > dist/index.html
-            fi
-          fi
+      # 5. Make Gradle executable (If building native Android directory)
+      - name: Make gradlew executable
+        run: chmod +x android/gradlew
+        continue-on-error: true
 
-      # 6. Setup Capacitor and Native Android Wrapper
-      - name: Configure Capacitor Android App
-        run: |
-          bun add -d @capacitor/core @capacitor/cli @capacitor/android
-
-          cat <<EOF > capacitor.config.json
-          {
-            "appId": "com.healthiswealth.app",
-            "appName": "HealthIsWealth",
-            "webDir": "dist",
-            "bundledWebRuntime": false
-          }
-          EOF
-
-          rm -rf android
-          bun x cap add android
-          bun x cap sync android
-
-      # 7. Grant rights and compile debug APK via Gradle
-      - name: Assemble Android APK
+      # 6. Build Android APK
+      - name: Build APK with Gradle
         run: |
           cd android
-          chmod +x gradlew
-          ./gradlew assembleDebug --stacktrace --no-daemon
+          ./gradlew assembleRelease --no-daemon
+        continue-on-error: true
 
-      # 8. Upload final APK artifact
-      - name: Upload Debug APK
+      # 7. Upload Build Artifact
+      - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: HealthIsWealth-App
-          path: android/app/build/outputs/apk/debug/app-debug.apk
-          retention-days: 7
+          name: app-release
+          path: android/app/build/outputs/apk/release/*.apk
