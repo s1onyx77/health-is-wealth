@@ -27,26 +27,25 @@ jobs:
           java-version: '17'
 
       - name: Install dependencies
-        run: bun install
+        run: |
+          bun install
+          bun add -d @capacitor/cli @capacitor/core @capacitor/android
 
-      # 1. Build web assets
       - name: Build Web Application
         run: bun run build
 
-      # 2. Add Android platform & Sync Capacitor assets
       - name: Add and Sync Android Project
         run: |
-          npx cap add android || true
-          npx cap sync android
+          bunx cap init "HealthIsWealth" "com.health.is.wealth" --web-dir dist || true
+          bunx cap add android || true
+          bunx cap sync android
 
-      # 3. Make Gradle executable and build release APK
       - name: Build APK with Gradle
         run: |
           cd android
           chmod +x gradlew
           ./gradlew assembleRelease --no-daemon
 
-      # 4. Upload APK Artifact
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
