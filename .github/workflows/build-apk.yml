@@ -20,9 +20,8 @@ jobs:
         with:
           bun-version: latest
 
-      # Updated to Java 21 to fix "invalid source release: 21"
       - name: Setup Java JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: 'zulu'
           java-version: '21'
@@ -41,14 +40,16 @@ jobs:
           bunx cap add android || true
           bunx cap sync android
 
+      # Build Debug APK instead of Unsigned Release APK
       - name: Build APK with Gradle
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleRelease --no-daemon
+          ./gradlew assembleDebug --no-daemon
 
+      # Upload the signed Debug APK
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: app-release
-          path: android/app/build/outputs/apk/release/*.apk
+          name: app-debug
+          path: android/app/build/outputs/apk/debug/*.apk
