@@ -20,11 +20,12 @@ jobs:
         with:
           bun-version: latest
 
+      # Updated to Java 21 to fix "invalid source release: 21"
       - name: Setup Java JDK
         uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
-          java-version: '17'
+          java-version: '21'
 
       - name: Install dependencies
         run: |
